@@ -286,6 +286,7 @@ export default function App() {
                   {(props) => <Tabs {...props} color={headerColor} />}
                 </Drawer.Screen>
 
+
                 <Drawer.Screen
                   name="Formulario"
                   component={FormScreen}
