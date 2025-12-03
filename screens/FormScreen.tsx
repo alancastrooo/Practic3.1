@@ -23,12 +23,6 @@ import {
   RadioIcon,
   CircleIcon,
   RadioLabel,
-  FormControlError,
-  FormControlErrorIcon,
-  AlertCircleIcon,
-  FormControlErrorText,
-  FormControlHelper,
-  FormControlHelperText,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -42,8 +36,72 @@ import {
   Textarea,
   TextareaInput,
 } from "@gluestack-ui/themed";
+import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function FormScreen() {
+  const { theme } = useTheme();
+  const { language } = useLanguage();
+
+  const isDark = theme === "dark";
+
+  const t = {
+    es: {
+      title: "Formulario de Componentes",
+      checkbox: "Checkbox - Intereses",
+      interests: ["Música", "Deportes", "Programación"],
+      link: "Link",
+      pressable: "Pressable",
+      pressMe: "Presióname",
+      pressed: "Presionado",
+      radio: "Radio - Método de pago",
+      selectLabel: "Selecciona una opción",
+      select: "Select - Color favorito",
+      slider: "Slider - Avance",
+      switch: "Switch - Notificaciones",
+      notifOn: "✅ Activadas",
+      notifOff: "❌ Desactivadas",
+      comments: "Comentarios",
+      placeholderComment: "Tu comentario...",
+      customComponent: "Componente Propio",
+      customDesc: "Este componente fue creado por Alan Castro.",
+      submit: "Enviar",
+      formSent: "Formulario Enviado",
+      thanks: "¡Gracias por llenar el formulario!",
+    },
+    en: {
+      title: "Components Form",
+      checkbox: "Checkbox - Interests",
+      interests: ["Music", "Sports", "Programming"],
+      link: "Link",
+      pressable: "Pressable",
+      pressMe: "Press me",
+      pressed: "Pressed",
+      radio: "Radio - Payment Method",
+      selectLabel: "Select an option",
+      select: "Select - Favorite Color",
+      slider: "Slider - Progress",
+      switch: "Switch - Notifications",
+      notifOn: "✅ Enabled",
+      notifOff: "❌ Disabled",
+      comments: "Comments",
+      placeholderComment: "Your comment...",
+      customComponent: "Custom Component",
+      customDesc: "This component was created by Alan Castro.",
+      submit: "Submit",
+      formSent: "Form Sent",
+      thanks: "Thank you for completing the form!",
+    },
+  }[language];
+
+  const colors = {
+    background: isDark ? "#121212" : "#FFFFFF",
+    text: isDark ? "#FFFFFF" : "#000000",
+    primary: isDark ? "#90CAF9" : "#1565C0",
+    card: isDark ? "#1E1E1E" : "#E3F2FD",
+    border: isDark ? "#333" : "#ccc",
+  };
+
   const [rValues, setRValues] = useState("Cash On Delivery");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState("");
@@ -60,26 +118,38 @@ export default function FormScreen() {
   };
 
   const handleSubmit = () => {
-    Alert.alert("Formulario Enviado", "¡Gracias por llenar el formulario!");
+    Alert.alert(t.formSent, t.thanks);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
-      <Text style={styles.title}>Formulario de Componentes</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
+      <Text style={[styles.title, { color: colors.primary }]}>
+        {t.title}
+      </Text>
 
       {/* Checkbox */}
-      <Text style={styles.sectionTitle}>Checkbox - Intereses</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.checkbox}
+      </Text>
+
       <View style={styles.checkboxGroup}>
-        {["Música", "Deportes", "Programación"].map((interest) => (
+        {t.interests.map((interest) => (
           <Pressable
             key={interest}
             style={[
               styles.checkboxItem,
-              selectedInterests.includes(interest) && styles.checkboxSelected,
+              { borderColor: colors.border },
+              selectedInterests.includes(interest) && {
+                backgroundColor: colors.card,
+                borderColor: colors.primary,
+              },
             ]}
             onPress={() => toggleInterest(interest)}
           >
-            <Text style={styles.checkboxLabel}>
+            <Text style={[styles.checkboxLabel, { color: colors.text }]}>
               {selectedInterests.includes(interest) ? "☑" : "☐"} {interest}
             </Text>
           </Pressable>
@@ -87,31 +157,43 @@ export default function FormScreen() {
       </View>
 
       {/* Link */}
-      <Text style={styles.sectionTitle}>Link</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.link}
+      </Text>
       <Link href="https://gluestack.io">
-        <Text style={{ color: "#1565C0", textDecorationLine: "underline" }}>
+        <Text style={{ color: colors.primary, textDecorationLine: "underline" }}>
           🔗 gluestack.io
         </Text>
       </Link>
 
       {/* Pressable */}
-      <Text style={styles.sectionTitle}>Pressable</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.pressable}
+      </Text>
       <Pressable
-        onPressIn={() => setTextValue("Presionado")}
+        onPressIn={() => setTextValue(t.pressed)}
         onPressOut={() => setTextValue("")}
-        style={[styles.pressable, textValue && styles.pressableActive]}
+        style={[
+          styles.pressable,
+          { backgroundColor: isDark ? "#333" : "#444" },
+          textValue && { backgroundColor: colors.primary },
+        ]}
       >
-        <Text style={styles.pressableText}>
-          {textValue ? "Pressed" : "Press me"}
+        <Text style={[styles.pressableText, { color: "#fff" }]}>
+          {textValue ? t.pressed : t.pressMe}
         </Text>
       </Pressable>
 
       {/* Radio */}
-      <Text style={styles.sectionTitle}>Radio - Método de pago</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.radio}
+      </Text>
+
       <FormControl isRequired isInvalid={!rValues}>
         <FormControlLabel>
-          <FormControlLabelText>Selecciona una opción</FormControlLabelText>
+          <FormControlLabelText>{t.selectLabel}</FormControlLabelText>
         </FormControlLabel>
+
         <RadioGroup value={rValues} onChange={setRValues}>
           <HStack space="2xl" mt="$2">
             <Radio value="Credit Card">
@@ -128,21 +210,17 @@ export default function FormScreen() {
             </Radio>
           </HStack>
         </RadioGroup>
-        <FormControlError>
-          <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>Campo obligatorio</FormControlErrorText>
-        </FormControlError>
       </FormControl>
 
       {/* Select */}
-      <Text style={styles.sectionTitle}>Select - Color favorito</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.select}
+      </Text>
+
       <FormControl isRequired isInvalid={!selectedColor}>
-        <FormControlLabel>
-          <FormControlLabelText>Selecciona un color</FormControlLabelText>
-        </FormControlLabel>
         <Select selectedValue={selectedColor} onValueChange={setSelectedColor}>
           <SelectTrigger>
-            <SelectInput placeholder="Selecciona una opción" />
+            <SelectInput placeholder={t.selectLabel} />
             <SelectIcon as={CircleIcon} />
           </SelectTrigger>
           <SelectPortal>
@@ -151,84 +229,80 @@ export default function FormScreen() {
               <SelectDragIndicatorWrapper>
                 <SelectDragIndicator />
               </SelectDragIndicatorWrapper>
-              <SelectItem label="Rojo" value="red" />
-              <SelectItem label="Azul" value="blue" />
-              <SelectItem label="Negro" value="black" />
-              <SelectItem label="Verde" value="green" />
+              <SelectItem label={language === "es" ? "Rojo" : "Red"} value="red" />
+              <SelectItem label={language === "es" ? "Azul" : "Blue"} value="blue" />
+              <SelectItem label={language === "es" ? "Negro" : "Black"} value="black" />
+              <SelectItem label={language === "es" ? "Verde" : "Green"} value="green" />
             </SelectContent>
           </SelectPortal>
         </Select>
-        <FormControlHelper>
-          <FormControlHelperText>Solo puedes elegir uno</FormControlHelperText>
-        </FormControlHelper>
-        <FormControlError>
-          <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>Campo obligatorio</FormControlErrorText>
-        </FormControlError>
       </FormControl>
 
       {/* Slider */}
-      <Text style={styles.sectionTitle}>
-        Slider - Avance {Math.round(sliderValue)}%
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.slider} {Math.round(sliderValue)}%
       </Text>
+
       <Slider
         style={{ width: "90%", alignSelf: "center" }}
         minimumValue={0}
         maximumValue={100}
         step={1}
-        minimumTrackTintColor="#1565C0"
-        maximumTrackTintColor="#ccc"
-        thumbTintColor="#1565C0"
+        minimumTrackTintColor={colors.primary}
+        maximumTrackTintColor={colors.border}
+        thumbTintColor={colors.primary}
         value={sliderValue}
         onValueChange={setSliderValue}
       />
 
       {/* Switch */}
-      <Text style={styles.sectionTitle}>Switch - Notificaciones</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.switch}
+      </Text>
       <View style={styles.switchContainer}>
-        <Text style={styles.switchLabel}>
-          {notifications ? "✅ Activadas" : "❌ Desactivadas"}
+        <Text style={[styles.switchLabel, { color: colors.text }]}>
+          {notifications ? t.notifOn : t.notifOff}
         </Text>
         <Switch
           value={notifications}
           onValueChange={setNotifications}
-          trackColor={{ false: "#ccc", true: "#64B5F6" }}
-          thumbColor={notifications ? "#1565C0" : "#f4f3f4"}
+          trackColor={{ false: colors.border, true: "#64B5F6" }}
+          thumbColor={notifications ? colors.primary : "#f4f3f4"}
         />
       </View>
 
       {/* Textarea */}
-      <Text style={styles.sectionTitle}>Comentarios</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.comments}
+      </Text>
+
       <FormControl isRequired isInvalid={!textValue}>
-        <FormControlLabel>
-          <FormControlLabelText>Escribe algo</FormControlLabelText>
-        </FormControlLabel>
         <Textarea>
           <TextareaInput
             value={textValue}
             onChangeText={setTextValue}
-            placeholder="Tu comentario..."
+            placeholder={t.placeholderComment}
           />
         </Textarea>
-        <FormControlHelper>
-          <FormControlHelperText>Campo opcional</FormControlHelperText>
-        </FormControlHelper>
-        <FormControlError>
-          <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>Campo obligatorio</FormControlErrorText>
-        </FormControlError>
       </FormControl>
 
-      {/* Componente propio */}
-      <Text style={styles.sectionTitle}>Componente Propio</Text>
+      {/* CustomCard */}
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t.customComponent}
+      </Text>
       <CustomCard
-        title="Información del formulario"
-        description="Este componente fue creado por Alan Castro. Aquí podrías mostrar datos del formulario o mensajes personalizados."
+        title={t.customComponent}
+        description={t.customDesc}
       />
 
       {/* Submit */}
-      <Pressable style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Enviar</Text>
+      <Pressable
+        style={[styles.submitButton, { backgroundColor: colors.primary }]}
+        onPress={handleSubmit}
+      >
+        <Text style={[styles.submitText, { color: "#fff" }]}>
+          {t.submit}
+        </Text>
       </Pressable>
     </ScrollView>
   );
@@ -237,20 +311,17 @@ export default function FormScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#",
     padding: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#1565C0",
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
     marginTop: 20,
     marginBottom: 10,
   },
@@ -262,28 +333,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  checkboxSelected: {
-    backgroundColor: "#E3F2FD",
-    borderColor: "#1565C0",
   },
   checkboxLabel: {
     fontSize: 16,
   },
   pressable: {
-    backgroundColor: "#333",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
     alignItems: "center",
     marginVertical: 10,
   },
-  pressableActive: {
-    backgroundColor: "#1565C0",
-  },
   pressableText: {
-    color: "#fff",
     fontSize: 16,
   },
   switchContainer: {
@@ -296,14 +357,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#1565C0",
     marginTop: 25,
     paddingVertical: 12,
     borderRadius: 25,
     alignItems: "center",
   },
   submitText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },

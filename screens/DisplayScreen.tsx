@@ -7,22 +7,46 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { Badge, useToast, Toast } from "@gluestack-ui/themed";
+import { Badge, useToast } from "@gluestack-ui/themed";
 import { ShoppingCart, CheckCircle } from "lucide-react-native";
+
+import { useTheme } from "../context/ThemeContext";  // ← IMPORTANTE
 
 export default function DisplayScreen() {
   const toast = useToast();
+  const { theme } = useTheme();
+
+  const colors = {
+    background: theme === "light" ? "#f5f5f5" : "#121212",
+    card: theme === "light" ? "#fff" : "#1e1e1e",
+    textPrimary: theme === "light" ? "#000" : "#fff",
+    textSecondary: theme === "light" ? "#444" : "#ccc",
+    border: theme === "light" ? "#ddd" : "#333",
+    tableHeader: theme === "light" ? "#f2f2f2" : "#222",
+    toastBg: theme === "light" ? "#d9f7dc" : "#1b3d1f",
+    toastBorder: theme === "light" ? "#a5d6a7" : "#2e7d32",
+  };
 
   const handleAddToCart = () => {
     toast.show({
       placement: "bottom",
       duration: 3000,
       render: () => (
-        <View style={styles.toastContainer}>
+        <View
+          style={[
+            styles.toastContainer,
+            {
+              backgroundColor: colors.toastBg,
+              borderColor: colors.toastBorder,
+            },
+          ]}
+        >
           <CheckCircle size={24} color="#2e7d32" style={{ marginRight: 10 }} />
           <View>
-            <Text style={styles.toastTitle}>Success</Text>
-            <Text style={styles.toastMessage}>
+            <Text style={[styles.toastTitle, { color: "#2e7d32" }]}>
+              Success
+            </Text>
+            <Text style={[styles.toastMessage, { color: "#2e7d32" }]}>
               Your order was placed successfully, thanks for shopping with us!
             </Text>
           </View>
@@ -32,8 +56,14 @@ export default function DisplayScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.card}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      {/* CARD PRODUCTO */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Image
           source={{
             uri: "https://gluestack.github.io/public-blog-video-assets/saree.png",
@@ -41,79 +71,110 @@ export default function DisplayScreen() {
           style={styles.image}
         />
 
-        <Text style={styles.category}>Fashion Clothing</Text>
-        <Text style={styles.title}>Cotton Kurta</Text>
+        <Text style={[styles.category, { color: colors.textSecondary }]}>
+          Fashion Clothing
+        </Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
+          Cotton Kurta
+        </Text>
 
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
           Floral embroidered notch neck thread work cotton kurta in white and
           black.
         </Text>
 
-        {/* 🔹 Botones en columna (Add to cart arriba, Wishlist abajo) */}
+        {/* Botones */}
         <View style={styles.buttonColumn}>
           <TouchableOpacity
             style={[styles.button, styles.addButton]}
             onPress={handleAddToCart}
           >
-            <Text style={[styles.buttonText, styles.addButtonText]}>
+            <Text style={[styles.buttonText, { color: "#fff" }]}>
               Add to cart
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.button, styles.wishlistButton]}>
-            <Text style={[styles.buttonText, styles.wishlistButtonText]}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.wishlistButton,
+              { borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.buttonText, { color: colors.textPrimary }]}>
               Wishlist
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* === Tabla de productos === */}
-      <View style={styles.tableCard}>
-        <Text style={styles.tableTitle}>Tabla de Productos</Text>
+      {/* TABLA */}
+      <View style={[styles.tableCard, { backgroundColor: colors.card }]}>
+        <Text style={[styles.tableTitle, { color: colors.textPrimary }]}>
+          Tabla de Productos
+        </Text>
 
-        {/* Encabezado */}
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={[styles.tableCell, styles.headerText]}>Producto</Text>
-          <Text style={[styles.tableCell, styles.headerText]}>Precio</Text>
-          <Text style={[styles.tableCell, styles.headerText]}>ST</Text>
+        <View
+          style={[
+            styles.tableRow,
+            styles.tableHeader,
+            { backgroundColor: colors.tableHeader },
+          ]}
+        >
+          <Text style={[styles.tableCell, styles.headerText, { color: colors.textPrimary }]}>
+            Producto
+          </Text>
+          <Text style={[styles.tableCell, styles.headerText, { color: colors.textPrimary }]}>
+            Precio
+          </Text>
+          <Text style={[styles.tableCell, styles.headerText, { color: colors.textPrimary }]}>
+            ST
+          </Text>
         </View>
 
-        {/* Filas */}
-
-
-
-        
-        <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>Kurta</Text>
-          <Text style={styles.tableCell}>$40</Text>
+        {/* FILAS */}
+        <View style={[styles.tableRow, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            Kurta
+          </Text>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            $40
+          </Text>
           <View style={[styles.tableCell, styles.statusCell]}>
             <Badge action="error" variant="solid">
               <Text style={{ color: "#fff", fontSize: 12 }}>Sold Out</Text>
             </Badge>
-            <ShoppingCart size={18} color="#000" style={{ marginLeft: 6 }} />
-          </View>
-
-        </View>
-        <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>Alan</Text>
-          <Text style={styles.tableCell}>$55</Text>
-          <View style={[styles.tableCell, styles.statusCell]}>
-             <Badge action="success" variant="solid">
-              <Text style={{ color: "#fff", fontSize: 12 }}>Available</Text>
-            </Badge>
-            <ShoppingCart size={18} color="#000" style={{ marginLeft: 6 }} />
+            <ShoppingCart size={18} style={{ marginLeft: 6 }} color={colors.textPrimary} />
           </View>
         </View>
 
-        <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>Saree</Text>
-          <Text style={styles.tableCell}>$55</Text>
+        <View style={[styles.tableRow, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            Alan
+          </Text>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            $55
+          </Text>
           <View style={[styles.tableCell, styles.statusCell]}>
             <Badge action="success" variant="solid">
               <Text style={{ color: "#fff", fontSize: 12 }}>Available</Text>
             </Badge>
-            <ShoppingCart size={18} color="#000" style={{ marginLeft: 6 }} />
+            <ShoppingCart size={18} style={{ marginLeft: 6 }} color={colors.textPrimary} />
+          </View>
+        </View>
+
+        <View style={[styles.tableRow, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            Saree
+          </Text>
+          <Text style={[styles.tableCell, { color: colors.textPrimary }]}>
+            $55
+          </Text>
+          <View style={[styles.tableCell, styles.statusCell]}>
+            <Badge action="success" variant="solid">
+              <Text style={{ color: "#fff", fontSize: 12 }}>Available</Text>
+            </Badge>
+            <ShoppingCart size={18} style={{ marginLeft: 6 }} color={colors.textPrimary} />
           </View>
         </View>
       </View>
@@ -122,23 +183,12 @@ export default function DisplayScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  },
+  container: { flexGrow: 1, alignItems: "center", padding: 20 },
   card: {
-    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 20,
     width: "90%",
     maxWidth: 380,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 4,
     marginBottom: 20,
   },
@@ -149,117 +199,51 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     resizeMode: "cover",
   },
-  category: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#000",
-    marginBottom: 6,
-  },
-  description: {
-    fontSize: 14,
-    color: "#444",
-    lineHeight: 20,
-    marginBottom: 20,
-  },
+  category: { fontSize: 14, marginBottom: 4 },
+  title: { fontSize: 20, fontWeight: "700", marginBottom: 6 },
+  description: { fontSize: 14, lineHeight: 20, marginBottom: 20 },
 
-  // 🔹 Botones en columna
-  buttonColumn: {
-    flexDirection: "column",
-    gap: 10,
-  },
+  buttonColumn: { flexDirection: "column", gap: 10 },
   button: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
   },
-  addButton: {
-    backgroundColor: "#000",
-  },
-  wishlistButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  addButtonText: {
-    color: "#fff",
-  },
-  wishlistButtonText: {
-    color: "#333",
-  },
+  addButton: { backgroundColor: "#000" },
+  wishlistButton: { backgroundColor: "transparent", borderWidth: 1 },
 
-  // === Tabla de productos ===
+  buttonText: { fontSize: 14, fontWeight: "600" },
+
   tableCard: {
-    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 15,
     width: "90%",
     maxWidth: 380,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
     elevation: 3,
   },
-  tableTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000",
-    marginBottom: 10,
-  },
+  tableTitle: { fontSize: 18, fontWeight: "700", marginBottom: 10 },
+
   tableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
-  tableHeader: {
-    backgroundColor: "#f2f2f2",
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 14,
-    color: "#333",
-  },
-  headerText: {
-    fontWeight: "700",
-  },
-  statusCell: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  tableHeader: {},
+  tableCell: { flex: 1, textAlign: "center", fontSize: 14 },
+  headerText: { fontWeight: "700" },
+  statusCell: { flexDirection: "row", justifyContent: "center", alignItems: "center" },
 
-  // === Toast personalizado ===
   toastContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#d9f7dc",
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#a5d6a7",
     maxWidth: 360,
   },
-  toastTitle: {
-    fontWeight: "700",
-    color: "#2e7d32",
-    fontSize: 16,
-  },
-  toastMessage: {
-    color: "#2e7d32",
-    fontSize: 13,
-  },
+  toastTitle: { fontWeight: "700", fontSize: 16 },
+  toastMessage: { fontSize: 13 },
 });

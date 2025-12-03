@@ -12,87 +12,184 @@ import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { StyledProvider } from "@gluestack-style/react";
 import { config } from "@gluestack-ui/config";
 
-// 🧩 Pantallas
+// CONTEXTOS
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
+
+// PANTALLAS
 import SplashScreen from "./screens/SplashScreen";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import FormScreen from "./screens/FormScreen";
-import DisplayScreen from "./screens/DisplayScreen"; // 👈 Nueva pantalla añadida
+import DisplayScreen from "./screens/DisplayScreen";
+import Users from "./screens/UsersScreen";
+import LanguageScreen from "./screens/LanguageScreen";
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+
 const COLORS = ["#1565C0", "#8E24AA", "#2E7D32", "#E65100", "#C62828"];
 
-function Tabs() {
+// ----------------------------------------------------------
+// 🟦 TRADUCCIONES GLOBALES
+// ----------------------------------------------------------
+const translations = {
+  es: {
+    home: "Inicio",
+    profile: "Perfil",
+    settings: "Ajustes",
+    form: "Formulario",
+    display: "Display",
+    users: "Usuarios",
+    languages: "Idiomas",
+    mainMenu: "Menú principal",
+    barColor: "Color de la barra",
+    appTheme: "Tema de la App",
+    changeLanguage: "Cambiar idioma",
+  },
+  en: {
+    home: "Home",
+    profile: "Profile",
+    settings: "Settings",
+    form: "Form",
+    display: "Display",
+    users: "Users",
+    languages: "Languages",
+    mainMenu: "Main menu",
+    barColor: "Bar color",
+    appTheme: "App theme",
+    changeLanguage: "Change language",
+  },
+};
+
+// ----------------------------------------------------------
+//  🟩 TABS SIN WARNINGS + TIPADO CORRECTO
+// ----------------------------------------------------------
+type TabNames = "Home" | "Profile" | "Settings";
+
+function Tabs({ color }: { color: string }) {
+  const { theme } = useTheme();
+  const { language } = useLanguage();
+  const isDark = theme === "dark";
+
+  const tabBg = isDark ? "#202020" : "#FFFFFF";
+  const borderColor = isDark ? "#2B2B2B" : "#E0E0E0";
+
+  const labels: Record<TabNames, string> = {
+    Home: translations[language].home,
+    Profile: translations[language].profile,
+    Settings: translations[language].settings,
+  };
+
+  const iconMap: Record<TabNames, keyof typeof Ionicons.glyphMap> = {
+    Home: "home",
+    Profile: "person",
+    Settings: "settings",
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ color, size }) => {
-          const icons: any = {
-            Inicio: "home",
-            Perfil: "person",
-            Ajustes: "settings",
-          };
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: "#1565C0",
-        tabBarInactiveTintColor: "gray",
+        tabBarStyle: { backgroundColor: tabBg, borderTopColor: borderColor },
+        tabBarActiveTintColor: isDark ? "#90CAF9" : color,
+        tabBarInactiveTintColor: isDark ? "#BDBDBD" : "gray",
+
+        // ICONOS ⬇ CORRECTAMENTE TIPADOS
+        tabBarIcon: ({ size, color: iconColor }) => (
+          <Ionicons name={iconMap[route.name as TabNames]} size={size} color={iconColor} />
+        ),
       })}
     >
-      <Tab.Screen name="Inicio" component={HomeScreen} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
-      <Tab.Screen name="Ajustes" component={SettingsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: labels.Home }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: labels.Profile }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: labels.Settings }} />
     </Tab.Navigator>
   );
 }
 
-// 🧭 Drawer personalizado
+// ----------------------------------------------------------
+//  🟧 DRAWER PERSONALIZADO CON IDIOMA
+// ----------------------------------------------------------
 function CustomDrawerContent(props: any) {
   const { navigation, color, setColor } = props;
+  const { theme, toggleTheme } = useTheme();
+  const { language } = useLanguage();
+
+  const tr = translations[language];
+  const isDark = theme === "dark";
+
+  const drawerBg = isDark ? "#1E1E1E" : "#FFFFFF";
+  const drawerText = isDark ? "#EFEFEF" : "#222222";
+  const drawerSubtitle = isDark ? "#BBBBBB" : "#555555";
+  const drawerBorder = isDark ? "#2A2A2A" : "#DDDDDD";
+
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} style={{ backgroundColor: drawerBg }}>
       <View style={{ padding: 16 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold", color: drawerText }}>
           Alan Castro – 21151078
         </Text>
-        <Text style={{ color: "#555", marginBottom: 12 }}>Menú principal</Text>
+        <Text style={{ color: drawerSubtitle, marginBottom: 12 }}>{tr.mainMenu}</Text>
       </View>
 
-      {/* ✅ Opciones del Drawer */}
       <DrawerItem
-        label="Inicio"
-        icon={() => <Ionicons name="home-outline" size={20} />}
-        onPress={() => navigation.navigate("Tabs", { screen: "Inicio" })}
+        label={tr.home}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="home-outline" size={20} color={drawerText} />}
+        onPress={() => navigation.navigate("Tabs", { screen: "Home" })}
       />
+
       <DrawerItem
-        label="Perfil"
-        icon={() => <Ionicons name="person-outline" size={20} />}
-        onPress={() => navigation.navigate("Tabs", { screen: "Perfil" })}
+        label={tr.profile}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="person-outline" size={20} color={drawerText} />}
+        onPress={() => navigation.navigate("Tabs", { screen: "Profile" })}
       />
+
       <DrawerItem
-        label="Ajustes"
-        icon={() => <Ionicons name="settings-outline" size={20} />}
-        onPress={() => navigation.navigate("Tabs", { screen: "Ajustes" })}
+        label={tr.settings}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="settings-outline" size={20} color={drawerText} />}
+        onPress={() => navigation.navigate("Tabs", { screen: "Settings" })}
       />
+
       <DrawerItem
-        label="Formulario"
-        icon={() => <Ionicons name="document-text-outline" size={20} />}
+        label={tr.form}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="document-text-outline" size={20} color={drawerText} />}
         onPress={() => navigation.navigate("Formulario")}
       />
+
       <DrawerItem
-        label="Display"
-        icon={() => <Ionicons name="albums-outline" size={20} />}
+        label={tr.display}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="albums-outline" size={20} color={drawerText} />}
         onPress={() => navigation.navigate("Display")}
       />
 
-      {/* 🎨 Selector de color de barra */}
-      <View style={{ padding: 16, borderTopWidth: 1, borderColor: "#ddd" }}>
-        <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
-          Color de la barra
+      <DrawerItem
+        label={tr.users}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="person-circle-outline" size={20} color={drawerText} />}
+        onPress={() => navigation.navigate("User")}
+      />
+
+      <DrawerItem
+        label={tr.languages}
+        labelStyle={{ color: drawerText }}
+        icon={() => <Ionicons name="language-outline" size={20} color={drawerText} />}
+        onPress={() => navigation.navigate("Idiomas")}
+      />
+
+      {/* COLOR SELECTOR */}
+      <View style={{ padding: 16, borderTopWidth: 1, borderColor: drawerBorder }}>
+        <Text style={{ color: drawerText, fontWeight: "bold", marginBottom: 8 }}>
+          {tr.barColor}
         </Text>
+
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           {COLORS.map((c) => (
             <TouchableOpacity
@@ -105,16 +202,48 @@ function CustomDrawerContent(props: any) {
                 backgroundColor: c,
                 margin: 5,
                 borderWidth: color === c ? 3 : 1,
-                borderColor: color === c ? "#000" : "#ccc",
+                borderColor: color === c ? "#FFF" : "#AAA",
               }}
             />
           ))}
         </View>
       </View>
+
+      {/* TEMA */}
+      <View style={{ padding: 16, borderTopWidth: 1, borderColor: drawerBorder }}>
+        <Text style={{ fontWeight: "bold", marginBottom: 12, color: drawerText }}>
+          {tr.appTheme}
+        </Text>
+
+        <TouchableOpacity
+          onPress={toggleTheme}
+          style={{
+            width: 70,
+            height: 35,
+            borderRadius: 50,
+            backgroundColor: isDark ? "#000" : "#CCC",
+            justifyContent: "center",
+            paddingHorizontal: 5,
+          }}
+        >
+          <View
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: "#FFF",
+              marginLeft: isDark ? 35 : 0,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
     </DrawerContentScrollView>
   );
 }
 
+// ----------------------------------------------------------
+// 🟥 APP PRINCIPAL
+// ----------------------------------------------------------
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -129,52 +258,62 @@ export default function App() {
   if (!loggedIn) return <LoginScreen onLogin={() => setLoggedIn(true)} />;
 
   return (
-    <GluestackUIProvider config={config}>
-      <StyledProvider config={config}>
-        <NavigationContainer>
-          <Drawer.Navigator
-            initialRouteName="Tabs"
-            drawerContent={(props) => (
-              <CustomDrawerContent
-                {...props}
-                color={headerColor}
-                setColor={setHeaderColor}
-              />
-            )}
-            screenOptions={{
-              headerStyle: { backgroundColor: headerColor },
-              headerTintColor: "#fff",
-              headerTitle: () => (
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontWeight: "bold",
-                    fontSize: 16,
-                  }}
-                >
-                  Alan Castro – 21151078
-                </Text>
-              ),
-            }}
-          >
-            <Drawer.Screen
-              name="Tabs"
-              component={Tabs}
-              options={{ title: "Menú principal" }}
-            />
-            <Drawer.Screen
-              name="Formulario"
-              component={FormScreen}
-              options={{ title: "Formulario Gluestack" }}
-            />
-            <Drawer.Screen
-              name="Display"
-              component={DisplayScreen}
-              options={{ title: "Pantalla Display" }}
-            />
-          </Drawer.Navigator>
-        </NavigationContainer>
-      </StyledProvider>
-    </GluestackUIProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <GluestackUIProvider config={config}>
+          <StyledProvider config={config}>
+            <NavigationContainer>
+              <Drawer.Navigator
+                initialRouteName="Tabs"
+                drawerContent={(props) => (
+                  <CustomDrawerContent
+                    {...props}
+                    color={headerColor}
+                    setColor={setHeaderColor}
+                  />
+                )}
+                screenOptions={{
+                  headerStyle: { backgroundColor: headerColor },
+                  headerTintColor: "#fff",
+                  headerTitle: () => (
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+                      Alan Castro – 21151078
+                    </Text>
+                  ),
+                }}
+              >
+                <Drawer.Screen name="Tabs">
+                  {(props) => <Tabs {...props} color={headerColor} />}
+                </Drawer.Screen>
+
+                <Drawer.Screen
+                  name="Formulario"
+                  component={FormScreen}
+                  options={{ title: "Formulario" }}
+                />
+
+                <Drawer.Screen
+                  name="Display"
+                  component={DisplayScreen}
+                  options={{ title: "Display" }}
+                />
+
+                <Drawer.Screen
+                  name="User"
+                  component={Users}
+                  options={{ title: "Usuarios" }}
+                />
+
+                <Drawer.Screen
+                  name="Idiomas"
+                  component={LanguageScreen}
+                  options={{ title: "Cambiar Idioma" }}
+                />
+              </Drawer.Navigator>
+            </NavigationContainer>
+          </StyledProvider>
+        </GluestackUIProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

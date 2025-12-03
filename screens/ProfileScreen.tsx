@@ -14,136 +14,190 @@ import {
 } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
 import CustomCard from "../components/CustomCard";
+import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
-// Imágenes optimizadas (ahora 7)
-const PHOTO_GRID_URIS: string[] = [
+// 🔵 TRADUCCIONES
+const translations = {
+  es: {
+    info: "Información",
+    email: "Correo",
+    phone: "Teléfono",
+    career: "Carrera",
+    gallery: "Galería",
+    progress: "Progreso académico",
+    completed: "Completado 80%",
+    active: "Activo",
+    about: "Sobre mí",
+    aboutText:
+      "Soy Alan Castro, estudiante de Ingeniería en TIC's. Actualmente cursando 9no semestre.",
+    goals: "Mis metas",
+    goalsDesc:
+      "Seguir aprendiendo más de la carrera y mejorar mis habilidades.",
+  },
+  en: {
+    info: "Information",
+    email: "Email",
+    phone: "Phone",
+    career: "Major",
+    gallery: "Gallery",
+    progress: "Academic progress",
+    completed: "Completed 80%",
+    active: "Active",
+    about: "About me",
+    aboutText:
+      "I am Alan Castro, an IT Engineering student. Currently in the 9th semester.",
+    goals: "My Goals",
+    goalsDesc: "Keep learning and improving my skills.",
+  },
+};
+
+const PHOTO_GRID_URIS = [
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80", // nueva
+  "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80",
 ];
 
 export default function ProfileScreen() {
+  const { theme } = useTheme();
+  const { language } = useLanguage();
+
+  const t = translations[language];
+  const isDark = theme === "dark";
+
+  const bgColor = isDark ? "#0D0D0D" : "#F5F7FA";
+  const cardBg = isDark ? "#1C1C1C" : "#FFFFFF";
+  const textPrimary = isDark ? "#FFFFFF" : "#0D47A1";
+  const textSecondary = isDark ? "#CCCCCC" : "#555555";
+
+  const shadowStyle = {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  };
+
   return (
-    <ScrollView contentContainerStyle={{ paddingVertical: 24, backgroundColor: "#FFFFFF" }}>
-      <VStack space="lg" alignItems="center">
-        {/* Foto de perfil */}
-        <Avatar size="2xl" bgColor="#1565C0" style={styles.avatarShadow}>
-          <AvatarImage alt="Foto de perfil" />
-          <AvatarFallbackText>AC</AvatarFallbackText>
-        </Avatar>
+    <ScrollView
+      style={{ backgroundColor: bgColor }}
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
+      <VStack space="lg" alignItems="center" mt="$6" px="$4">
 
-        {/* Nombre */}
-        <Text style={styles.name}>Alan Castro</Text>
-        <Text style={styles.subtitle}>
-          Estudiante de Ingeniería en TIC's • 21151078
-        </Text>
+        {/* 🔵 TARJETA PRINCIPAL */}
+        <Box
+          w="100%"
+          p="$5"
+          bg={cardBg}
+          rounded="$2xl"
+          alignItems="center"
+          style={shadowStyle}
+        >
+          <Avatar size="2xl" bgColor="#1565C0" style={styles.avatarShadow}>
+            <AvatarImage alt="Foto de perfil" />
+            <AvatarFallbackText>AC</AvatarFallbackText>
+          </Avatar>
 
-        {/* Sección tipo estadísticas */}
-        <HStack justifyContent="center" space="2xl" mt="$3" alignItems="center">
-          <VStack alignItems="center">
-            <MaterialIcons name="email" size={22} color="#1565C0" />
-            <Text bold color="#0D47A1">Correo</Text>
-            <Text color="#424242" fontSize={12}>alan@gmail.com</Text>
-          </VStack>
+          <Text mt="$3" fontSize={22} bold style={{ color: textPrimary }}>
+            Alan Castro
+          </Text>
 
-          <VStack alignItems="center">
-            <MaterialIcons name="phone" size={22} color="#1565C0" />
-            <Text bold color="#0D47A1">Teléfono</Text>
-            <Text color="#424242" fontSize={12}>+52 449 457 0000</Text>
-          </VStack>
+          <Text mt="$1" fontSize={14} style={{ color: textSecondary }}>
+            Ing. TIC's • 21151078
+          </Text>
+        </Box>
 
-          <VStack alignItems="center">
-            <MaterialIcons name="school" size={22} color="#1565C0" />
-            <Text bold color="#0D47A1">Carrera</Text>
-            <Text color="#424242" fontSize={12}>Ing. en TIC's</Text>
-          </VStack>
-        </HStack>
+        {/* 🔵 INFORMACIÓN */}
+        <Box w="100%" p="$4" bg={cardBg} rounded="$2xl" style={shadowStyle}>
+          <Text bold color={textPrimary} fontSize={16} mb="$3">
+            {t.info}
+          </Text>
 
-        {/* Galería (similar al ejemplo, ahora con 7 imágenes) */}
-        <Box w="100%" mt="$6" px="$4">
-          <Text bold color="#0D47A1" mb="$2">Galería</Text>
+          <HStack justifyContent="space-between">
+            <VStack alignItems="center" flex={1}>
+              <MaterialIcons name="email" size={24} color="#1565C0" />
+              <Text bold color={textPrimary}>{t.email}</Text>
+              <Text color={textSecondary} fontSize={12}>alan@gmail.com</Text>
+            </VStack>
 
-          {/* Imagen principal */}
-          <View style={styles.mainImageContainer}>
-            <RNImage
-              source={{ uri: PHOTO_GRID_URIS[0] }}
-              style={styles.mainImage}
-              resizeMode="cover"
-            />
-          </View>
+            <VStack alignItems="center" flex={1}>
+              <MaterialIcons name="phone" size={24} color="#1565C0" />
+              <Text bold color={textPrimary}>{t.phone}</Text>
+              <Text color={textSecondary} fontSize={12}>+52 449 457 0000</Text>
+            </VStack>
 
-          {/* Primera fila de miniaturas */}
-          <HStack justifyContent="space-between" mt="$2">
-            {PHOTO_GRID_URIS.slice(1, 4).map((uri, idx) => (
-              <View key={`row1-${idx}`} style={styles.thumbWrapper}>
-                <RNImage source={{ uri }} style={styles.thumbImage} resizeMode="cover" />
-              </View>
-            ))}
-          </HStack>
-
-          {/* Segunda fila de miniaturas */}
-          <HStack justifyContent="space-between" mt="$2">
-            {PHOTO_GRID_URIS.slice(4, 7).map((uri, idx) => (
-              <View key={`row2-${idx}`} style={styles.thumbWrapper}>
-                <RNImage source={{ uri }} style={styles.thumbImage} resizeMode="cover" />
-              </View>
-            ))}
+            <VStack alignItems="center" flex={1}>
+              <MaterialIcons name="school" size={24} color="#1565C0" />
+              <Text bold color={textPrimary}>{t.career}</Text>
+              <Text color={textSecondary} fontSize={12}>Ing. TIC's</Text>
+            </VStack>
           </HStack>
         </Box>
 
-        {/* Progreso académico */}
-        <Box
-          mt="$6"
-          p="$4"
-          bg="#EDF6FF"
-          rounded="$xl"
-          w="90%"
-          borderWidth={1}
-          borderColor="#90CAF9"
-          alignItems="center"
-        >
-          <Text bold color="#0D47A1" mb="$2">
-            Progreso académico
+        {/* 🔵 GALERÍA */}
+        <Box w="100%">
+          <Text bold color={textPrimary} mb="$2">{t.gallery}</Text>
+
+          <Box p="$4" bg={cardBg} rounded="$2xl" style={shadowStyle}>
+            <View style={styles.mainImageContainer}>
+              <RNImage source={{ uri: PHOTO_GRID_URIS[0] }} style={styles.mainImage} />
+            </View>
+
+            <View style={{ marginTop: 12 }}>
+              <HStack justifyContent="space-between" mb="$2">
+                {PHOTO_GRID_URIS.slice(1, 4).map((uri, idx) => (
+                  <View key={`r1-${idx}`} style={styles.thumbWrapper}>
+                    <RNImage source={{ uri }} style={styles.thumbImage} />
+                  </View>
+                ))}
+              </HStack>
+
+              <HStack justifyContent="space-between">
+                {PHOTO_GRID_URIS.slice(4, 7).map((uri, idx) => (
+                  <View key={`r2-${idx}`} style={styles.thumbWrapper}>
+                    <RNImage source={{ uri }} style={styles.thumbImage} />
+                  </View>
+                ))}
+              </HStack>
+            </View>
+          </Box>
+        </Box>
+
+        {/* 🔵 PROGRESO */}
+        <Box w="100%" p="$5" bg={cardBg} rounded="$2xl" style={shadowStyle}>
+          <Text bold color={textPrimary} mb="$2" fontSize={16}>
+            {t.progress}
           </Text>
+
           <Progress value={80} w="100%">
             <ProgressFilledTrack bg="#1565C0" />
           </Progress>
+
           <HStack justifyContent="space-between" mt="$2" w="100%">
-            <Text color="#424242">Completado 80%</Text>
+            <Text color={textSecondary}>{t.completed}</Text>
             <Badge bg="#C8E6C9">
               <Text color="#1B5E20" bold>
-                Activo
+                {t.active}
               </Text>
             </Badge>
           </HStack>
         </Box>
 
-        {/* Sección sobre mí */}
-        <Box
-          mt="$5"
-          p="$4"
-          bg="#F0F7FF"
-          borderWidth={1}
-          borderColor="#90CAF9"
-          rounded="$xl"
-          w="90%"
-        >
-          <Text bold color="#0D47A1" mb="$2">Sobre mí</Text>
-          <Text color="#424242" textAlign="center">
-            Soy Alan Castro, estudiante de Ingeniería en Tecnologías de la
-            Información y Comunicaciones. Actualmente cursando 9no semestre.
+        {/* 🔵 SOBRE MÍ */}
+        <Box w="100%" p="$5" bg={cardBg} rounded="$2xl" style={shadowStyle}>
+          <Text bold color={textPrimary} mb="$2">{t.about}</Text>
+          <Text color={textSecondary} textAlign="center">
+            {t.aboutText}
           </Text>
         </Box>
 
-        {/* Componente propio */}
-        <CustomCard
-          title="Mis metas"
-          description="Seguir aprendiendo más de la carrera y mejorar mis habilidades (Componente propio)."
-        />
+        {/* 🔵 CUSTOM CARD */}
+        <CustomCard title={t.goals} description={t.goalsDesc} />
       </VStack>
     </ScrollView>
   );
@@ -157,26 +211,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
   },
-  name: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginTop: 8,
-    color: "#0D47A1",
-  },
-  subtitle: {
-    color: "#424242",
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 8,
-  },
   mainImageContainer: {
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: "hidden",
   },
   mainImage: {
     width: "100%",
-    height: 150,
-    borderRadius: 16,
+    height: 160,
   },
   thumbWrapper: {
     width: "32%",
@@ -188,4 +229,3 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
 });
-
